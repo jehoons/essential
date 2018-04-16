@@ -10,8 +10,8 @@ fastmath=True
 [blas]
 ldflags=-lopenblas
 [cuda]
-root=/usr/local/cuda-8.0
+root=/usr/local/cuda-9.0
 [dnn]
-library_path=/usr/local/cuda-8.0/lib64
-include_path=/usr/local/cuda-8.0/include
+library_path=/usr/local/cuda-9.0/lib64
+include_path=/usr/local/cuda-9.0/include
 

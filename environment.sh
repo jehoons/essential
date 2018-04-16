@@ -131,7 +131,7 @@ start(){
     if [ "$1" = "yes" ]
     then 
         echo "run with nvidia/cuda ..."
-        docker run --runtime=nvidia --rm -d --name ${CONTAINER} ${PORT_MAPS} ${VOLUMNE_MAPS} ${IMAGE} 
+        nvidia-docker run --rm -d --name ${CONTAINER} ${PORT_MAPS} ${VOLUMNE_MAPS} ${IMAGE} 
     else 
         docker run --rm -d --name ${CONTAINER} ${PORT_MAPS} ${VOLUMNE_MAPS} ${IMAGE} 
     fi 

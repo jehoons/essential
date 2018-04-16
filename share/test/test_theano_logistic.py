@@ -1,19 +1,17 @@
 import os ; os.environ['THEANO_FLAGS'] = "device=cuda0" 
-# import os ; os.environ['THEANO_FLAGS'] = "device=cpu" 
 
 def test_theano(): 
-
     import numpy
     import theano
     import theano.tensor as T
     rng = numpy.random
 
-    N = 40000                                   # training sample size
-    feats = 64                               # number of input variables
+    N = 400                  # training sample size
+    feats = 64               # number of input variables
 
     # generate a dataset: D = (input_values, target_class)
     D = (rng.randn(N, feats), rng.randint(size=N, low=0, high=2))
-    training_steps = 100000
+    training_steps = 100
 
     # Declare Theano symbolic variables
     x = T.dmatrix("x")

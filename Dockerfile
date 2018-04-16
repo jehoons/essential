@@ -364,7 +364,9 @@ RUN echo "export PYTHONIOENCODING=$PYTHONIOENCODING" >> $PROFILE
 RUN echo "export LANG=en_US.UTF-8" >> $PROFILE 
 RUN cat mybashrc >> $PROFILE
 ENV SCRATCH_DIR="$HOME/.scratch"
-RUN rm -rf mybashrc neobundle.sh scratch supertab.vmb vim vim.tar.gz
+
+RUN rm -rf /root/mybashrc neobundle.sh scratch supertab.vmb vim vim.tar.gz
+
 RUN chown -R root:root ${HOME} 
 
 VOLUME ${HOME}

@@ -346,7 +346,6 @@ COPY .theanorc ${HOME}/.theanorc
 RUN chown -R root:root ${HOME} 
 RUN chown -R root:root ${LOCAL_PACKAGE_DIR} 
 RUN chsh -s /bin/bash root
-RUN rm -rf mybashrc neobundle.sh scratch supertab.vmb vim vim.tar.gz
 
 # Set usr env variables 
 ENV LD_LIBRARY_PATH ${RDBASE}/lib:${LD_LIBRARY_PATH}
@@ -364,10 +363,9 @@ RUN echo "export PATH=$PATH" >> $PROFILE
 RUN echo "export PYTHONIOENCODING=$PYTHONIOENCODING" >> $PROFILE
 RUN echo "export LANG=en_US.UTF-8" >> $PROFILE 
 RUN cat mybashrc >> $PROFILE
-# RUN rm -f bashrc
-RUN chown -R root:root ${HOME} 
-
 ENV SCRATCH_DIR="$HOME/.scratch"
+RUN rm -rf mybashrc neobundle.sh scratch supertab.vmb vim vim.tar.gz
+RUN chown -R root:root ${HOME} 
 
 VOLUME ${HOME}
 

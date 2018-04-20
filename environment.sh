@@ -49,9 +49,9 @@ c = json.load(open('config.json'))
 print(c['tensorflow']['cudnn_version'])
 ")
 
-#echo "compute: $TF_CUDA_COMPUTE_CAPABILITIES"
-#echo "cuda: $TF_CUDA_VERSION"
-#echo "cudnn: $TF_CUDNN_VERSION"
+echo "compute: $TF_CUDA_COMPUTE_CAPABILITIES"
+echo "cuda: $TF_CUDA_VERSION"
+echo "cudnn: $TF_CUDNN_VERSION"
 
 python -c "
 txt=\"\"\"[global]

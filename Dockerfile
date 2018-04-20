@@ -236,9 +236,9 @@ RUN mkdir /bazel && \
 WORKDIR /tensorflow
 RUN git clone --branch=r1.7 --depth=1 https://github.com/tensorflow/tensorflow.git .
 
-RUN [ "$TF_CUDA_VERSION" -eq "8.0" ] && \
+RUN [ "$TF_CUDA_VERSION" = "8.0" ] && \
 	cp /usr/local/cuda-8.0/nvvm/libdevice/libdevice.compute_50.10.bc /usr/local/cuda-8.0/nvvm/libdevice/libdevice.10.bc || \
-	echo "cuda version: $TF_CUDA_VERSION"
+	echo "??cuda version: $TF_CUDA_VERSION"
 
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
     LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} tensorflow/tools/ci_build/builds/configured GPU bazel build --jobs 30 -c opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" tensorflow/tools/pip_package:build_pip_package && \
@@ -369,7 +369,7 @@ RUN rm -rf /root/mybashrc neobundle.sh scratch supertab.vmb vim vim.tar.gz
 
 RUN chown -R root:root ${HOME} 
 
-VOLUME ${HOME}
+# VOLUME ${HOME}
 
 EXPOSE 8888
 

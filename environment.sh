@@ -1,17 +1,31 @@
 #!/bin/bash 
 OWNER=$(basename ${HOME})
 
-MAJOR_IMAGE=$(python -c "
+MY_IMAGE=$(python -c "
 import json
 c = json.load(open('config.json'))
 print(c['name'])
 ")
 
-BASE_IMAGE=$(python -c "
+MY_IMAGE_TAG=$(python -c "
+import json
+c = json.load(open('config.json'))
+print(c['tag'])
+")
+
+BASE_IMAGE_NAME=$(python -c "
+import json
+c = json.load(open('config.json'))
+print(c['base']['name'])
+")
+
+BASE_IMAGE_TAG=$(python -c "
 import json
 c = json.load(open('config.json'))
 print(c['base']['tag'])
 ")
+
+BASE_IMAGE="${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}"
 
 CUDA_ROOT=$(python -c "
 import json
@@ -49,9 +63,9 @@ c = json.load(open('config.json'))
 print(c['tensorflow']['cudnn_version'])
 ")
 
-echo "compute: $TF_CUDA_COMPUTE_CAPABILITIES"
-echo "cuda: $TF_CUDA_VERSION"
-echo "cudnn: $TF_CUDNN_VERSION"
+#echo "compute: $TF_CUDA_COMPUTE_CAPABILITIES"
+#echo "cuda: $TF_CUDA_VERSION"
+#echo "cudnn: $TF_CUDNN_VERSION"
 
 python -c "
 txt=\"\"\"[global]
@@ -74,16 +88,18 @@ include_path=${CUDA_ROOT}/include
 print(txt) 
 " > .theanorc && chown -R ${OWNER}:${OWNER} .theanorc
 
-IMAGE=${DOCKER_ID}/${MAJOR_IMAGE}:${BASE_IMAGE} 
-IMAGE_FILE=${MAJOR_IMAGE}-${BASE_IMAGE}.tar
-CONTAINER=${MAJOR_IMAGE}-${BASE_IMAGE}-${OWNER} 
+# MY_IMAGE_TAG=$BASE_IMAGE_TAG 
+
+IMAGE=${DOCKER_ID}/${MY_IMAGE}:${MY_IMAGE_TAG}
+IMAGE_FILE=${MY_IMAGE}-${MY_IMAGE_TAG}.tar
+CONTAINER=${MY_IMAGE}-${MY_IMAGE_TAG}-${OWNER} 
 DOCKER_HOME=/root
 HOST_SCRATCH_DIR=${HOME}/.scratch
 DOCKER_SCRATCH_DIR=${DOCKER_HOME}/.scratch
 VOLUMNE_MAPS="-v ${HOST_SCRATCH_DIR}:${DOCKER_SCRATCH_DIR} -v `pwd`/share:${DOCKER_HOME}/share -v ${HOME}:${DOCKER_HOME}/home"
 PORT_MAPS=-P 
 
-BUILD_ARGS="--build-arg BASE_IMAGE=${BASE_IMAGE} --build-arg TF_CUDA_COMPUTE_CAPABILITIES=${TF_CUDA_COMPUTE_CAPABILITIES} --build-arg TF_CUDA_VERSION=${TF_CUDA_VERSION} --build-arg TF_CUDNN_VERSION=${TF_CUDNN_VERSION}"
+BUILD_ARGS="--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} --build-arg BASE_IMAGE_NAME=${BASE_IMAGE_NAME} --build-arg TF_CUDA_COMPUTE_CAPABILITIES=${TF_CUDA_COMPUTE_CAPABILITIES} --build-arg TF_CUDA_VERSION=${TF_CUDA_VERSION} --build-arg TF_CUDNN_VERSION=${TF_CUDNN_VERSION}"
 
 # ------------- main ------------
 shell(){ 
@@ -121,11 +137,10 @@ jupyter_address(){
     conn_jupyter=$(echo ${jupaddr} | sed "s/8888/${jupport}/g")
     conn_jupyterlab=$(echo ${conn_jupyter} | sed "s/?/lab?/g")
     echo 
-    echo "Jupyter addressis is ${conn_jupyter}"
-    echo "   or  "
     echo "JupyterLab address is ${conn_jupyterlab}"
     echo 
     echo "enjoy!"
+    echo ${conn_jupyterlab} > jupyter_connection.info
 }
 
 start(){

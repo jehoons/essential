@@ -6,7 +6,7 @@ from datetime import datetime
 #device_name = sys.argv[1]  # Choose device from cmd line. Options: gpu or cpu
 #shape = (int(sys.argv[2]), int(sys.argv[2]))
 shape = (100,100) 
-device_name = '/device:GPU:0'
+device_name = '/device:CPU:0'
 
 
 from tensorflow.python.client import device_lib

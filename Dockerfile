@@ -1,8 +1,9 @@
-ARG BASE_IMAGE
-FROM nvidia/cuda:${BASE_IMAGE} 
-ARG BASE_IMAGE
-RUN echo "base image is ${BASE_IMAGE}"
-
+ARG BASE_IMAGE_TAG
+ARG BASE_IMAGE_NAME
+FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG} 
+ARG BASE_IMAGE_TAG
+ARG BASE_IMAGE_NAME
+RUN echo "FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}"
 MAINTAINER Je-Hoon Song "song.jehoon@gmail.com"
 
 RUN echo "root:docker" | chpasswd
@@ -236,17 +237,14 @@ RUN mkdir /bazel && \
 WORKDIR /tensorflow
 RUN git clone --branch=r1.7 --depth=1 https://github.com/tensorflow/tensorflow.git .
 
-RUN [ "$TF_CUDA_VERSION" = "8.0" ] && \
-	cp /usr/local/cuda-8.0/nvvm/libdevice/libdevice.compute_50.10.bc /usr/local/cuda-8.0/nvvm/libdevice/libdevice.10.bc || \
-	echo "??cuda version: $TF_CUDA_VERSION"
+RUN apt-get install -y bc
 
-RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
-    LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} tensorflow/tools/ci_build/builds/configured GPU bazel build --jobs 30 -c opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" tensorflow/tools/pip_package:build_pip_package && \
-    rm /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
-    bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip && \
-    pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl && \
-    rm -rf /tmp/pip && \
-    rm -rf /root/.cache
+# Run if cuda <= 8.0
+RUN [ $BASE_IMAGE_NAME = "nvidia/cuda" ] && [ 1 = "$(echo \"$TF_CUDA_VERSION <= 8.0\" | bc)" ] && cp /usr/local/cuda-8.0/nvvm/libdevice/libdevice.compute_50.10.bc /usr/local/cuda-8.0/nvvm/libdevice/libdevice.10.bc || echo "passed"
+
+RUN [ $BASE_IMAGE_NAME = "nvidia/cuda" ] && ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} tensorflow/tools/ci_build/builds/configured GPU bazel build --jobs 30 -c opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" tensorflow/tools/pip_package:build_pip_package && rm /usr/local/cuda/lib64/stubs/libcuda.so.1 && bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip && pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl && rm -rf /tmp/pip && rm -rf /root/.cache || echo "passed"
+
+RUN [ $BASE_IMAGE_NAME != "nvidia/cuda" ] && export TF_NEED_CUDA=0 && tensorflow/tools/ci_build/builds/configured CPU bazel build --jobs 30 -c opt --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" tensorflow/tools/pip_package:build_pip_package && bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip && pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl && rm -rf /tmp/pip && rm -rf /root/.cache || echo "passed" 
 
 WORKDIR /root 
 ############

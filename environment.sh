@@ -1,4 +1,30 @@
 #!/bin/bash 
+source $(dirname $0)/argparse.bash || exit 1
+argparse "$@" <<EOF || exit 1
+parser.description = 'This is a Docker environment for My project.'
+parser.add_argument('exec_mode', type=str, 
+    help='shell|push|pull|pload|save|build|jup|start|update'
+    )
+parser.add_argument('-f', '--foreground', 
+    action='store_true',
+    help='run with foreground mode? [default %(default)s]', 
+    default=False
+    )
+parser.add_argument('-n', '--nvidia', 
+    action='store_true',
+    help='run with foreground mode? [default %(default)s]', 
+    default=False
+    )
+
+# this arg is not working 
+parser.add_argument('-c', '--config', metavar='FILE', type=str,
+    help='config file to use [default %(default)s]',
+    default='config.json')
+EOF
+
+# echo "'config.json'"
+# CONFIG=config.json
+
 OWNER=$(basename ${HOME})
 
 MY_IMAGE=$(python -c "
@@ -166,26 +192,6 @@ stop(){
 	docker stop ${CONTAINER}
 }
 
-source $(dirname $0)/argparse.bash || exit 1
-argparse "$@" <<EOF || exit 1
-parser.description = 'This is a Docker environment for My project.'
-parser.add_argument('exec_mode', type=str, 
-    help='shell|push|pull|pload|save|build|jup|start|update'
-    )
-
-parser.add_argument('-f', '--foreground', 
-    action='store_true',
-    help='run with foreground mode? [default %(default)s]', 
-    default=False
-    )
-
-parser.add_argument('-n', '--nvidia', 
-    action='store_true',
-    help='run with foreground mode? [default %(default)s]', 
-    default=False
-    )
-
-EOF
 
 case "${EXEC_MODE}" in
     save)

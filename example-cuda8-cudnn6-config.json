@@ -1,0 +1,16 @@
+{
+    "name": "essential",
+    "tag": "cuda8.0-cudnn6-devel-ubuntu16.04",
+    "base": {
+        "name": "nvidia/cuda", 
+        "tag": "8.0-cudnn6-devel-ubuntu16.04"
+    }, 
+    "tensorflow": {
+        "cuda_version": "8.0", 
+        "cudnn_version": "6",
+        "compute_capabilities": "3.0,3.5,5.2,6.0,6.1"
+    },
+    "cuda_root": "/usr/local/cuda-8.0", 
+    "host": "192.168.0.122", 
+    "docker-id": "jhsong"
+}
